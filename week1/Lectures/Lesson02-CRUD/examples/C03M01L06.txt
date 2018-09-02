@@ -20,7 +20,8 @@ db[:zips].insert_one(:_id => "100",:city => "city01",:loc => [ -76.0592270000000
 
 #find count (for insert_one)
 db[:zips].find(:city => "city01").count
-
+=>1
+db[:zips].find(:city => "city01").to_a  //print 
 ________________________________________________________
 #(Slide 4)
 #insert_many
@@ -35,3 +36,5 @@ ________________________________________________________
 #find count (for insert_many)
 db[:zips].find(:city => 'city02').count
 db[:zips].find(:city => 'city03').count
+
+_id primary key for every document or Mongo will automatically give it to the document.

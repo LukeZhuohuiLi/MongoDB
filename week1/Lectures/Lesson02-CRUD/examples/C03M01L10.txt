@@ -56,6 +56,7 @@ _____________________________________________________________________
 db[:zips].find(:city => "ODENVILLE1").count
 db[:zips].find(:city => "ODENVILLE2").count
 db[:zips].find(:city => "ODENVILLE1").update_one({:$set => {:city => "ODENVILLE2"}}, :upsert => true)
+//if city is found, update, if not found, insert
 db[:zips].find(:city => "ODENVILLE1").count
 db[:zips].find(:city => "ODENVILLE2").count
 

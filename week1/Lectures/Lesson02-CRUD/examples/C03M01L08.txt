@@ -2,12 +2,12 @@ _________________________________________________________________________
 #(Slide 3)
 #Paging Limit
 db[:zips].find.limit(3).each { |r| pp r}
-
+retrieves a list of the first three documents for us
 _________________________________________________________________________
 #(slide 4)
 #Limit and Skip
 db[:zips].find.skip(3).limit(3).each { |r| pp r}
-
+Skips the first three and retrieves the next three
 _________________________________________________________________________
 #(slide 5)
 # Sorting

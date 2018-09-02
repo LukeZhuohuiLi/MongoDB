@@ -32,7 +32,7 @@ _______________________________________________________________________
 #(slide 7)
 #Find by $exists
 db[:zips].find(:city => {:$exists => true}).projection({:_id => false}).limit(3).to_a.each {|r| pp r}
-
+db[:zips].find(:city => {:$exists => true}).projection({:_id => false}).limit(3).to_a.each {|r| pp r}; //take away trailing data
 ______________________________________________________________________
 #(slide 8)
 #Find by $not
@@ -42,5 +42,5 @@ ______________________________________________________________________
 #(slide 9)
 #Find by $type
 db[:zips].find({:state=> {:$type => 2}}).first
-
+https://docs.mongodb.com/manual/reference/bson-types/
 

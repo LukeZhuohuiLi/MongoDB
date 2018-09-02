@@ -1,4 +1,4 @@
-require_relative "../assignment"
+require_relative "../assignment.rb"
 require 'rspec'
 require 'mongo'
 

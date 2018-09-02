@@ -1,0 +1,24 @@
+high-throughput
+operations
+Once a collection fills its allocated space, it makes room
+for new documents by overwriting the oldest documents in
+the collection
+db.createCollection("log", { capped : true,
+size : 5242880, max : 5000 } )
+
+Mongo Code
+mongo--use test---db.zips.findOne()
+> db.auth("luke","123456")
+1
+> db.zips.findOne()
+{
+        "_id" : "01010",
+        "city" : "BRIMFIELD",
+        "loc" : [
+                -72.188455,
+                42.116543
+        ],
+        "pop" : 3706,
+        "state" : "MA"
+}
+

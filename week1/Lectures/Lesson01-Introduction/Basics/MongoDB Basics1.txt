@@ -1,0 +1,34 @@
+mongoimport --db test --collection zips --drop --file c:\tmp\zips.json
+
+
+insert with Auth
+C:\WINDOWS\system32>mongo
+MongoDB shell version v4.0.0
+connecting to: mongodb://127.0.0.1:27017
+MongoDB server version: 4.0.0
+> use admin
+switched to db admin
+> db.auth("useradmin", "123456")
+1
+> user test2
+2018-09-01T00:29:41.869-0700 E QUERY    [js] SyntaxError: missing ; before statement @(shell):1:5
+> use test2
+switched to db test2
+> db.createUser(
+... {
+... user: "luke",
+... pwd: "123456",
+... roles: ["readWrite"]
+... }
+... )
+Successfully added user: { "user" : "luke", "roles" : [ "readWrite" ] }
+> ^C
+bye
+
+C:\WINDOWS\system32>
+
+C:\WINDOWS\system32>mongoimport -u "luke" -p "123456" --db test2 --collection zips --drop --file c:\zips.json
+2018-09-01T00:31:53.759-0700    connected to: localhost
+2018-09-01T00:31:53.792-0700    dropping: test2.zips
+2018-09-01T00:31:54.419-0700    imported 29353 documents
+

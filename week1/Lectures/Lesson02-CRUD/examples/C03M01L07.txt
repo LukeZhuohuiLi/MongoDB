@@ -3,6 +3,10 @@ _________________________________________________________________________
 #(Slide 3)
 #find by example 
 db[:zips].find(:city => "BALTIMORE")
+Return view
+
+db[:zips].find(:city => "BALTIMORE").first
+return document
 
 #find first
 db[:zips].find.first
@@ -11,11 +15,12 @@ db[:zips].find(:state => "MD").first
 
 #distinct
 db[:zips].find.distinct(:state)
+return different states' name
 
 _________________________________________________________________________
 #(Slide 4)
 #find by (hash) - passing parameters
-db[:zips].find(:city => "GERMANTOWN").count
+db[:zips].find(:city => "GERMANTOWN").count =>8
 db[:zips].find(:city => "GERMANTOWN").first
 
 require 'pp'
@@ -27,7 +32,7 @@ pp db[:zips].find(:city => "GERMANTOWN", :state => "MD").first
 _________________________________________________________________________
 #(Slide 5)
 #cursor iterations
-db[:zips].find().each { |r| puts r }
+db[:zips].find().each { |r| puts r }//print everything
 
 db[:zips].find().each { |r| pp r }
 
@@ -35,9 +40,12 @@ db[:zips].find().each { |r| pp r }
 _________________________________________________________________________
 #(Slide 7)
 
-#PROJECTIONS - 
-db[:zips].find({:state => "MD"}).projection(state:true, _id:false).first
+#PROJECTIONS - //limit the field to return from all matching document
+db[:zips].find({:state => "MD"}).projection(state:true).first
+{"_id"=>"20331", "state" => "MD"}
 
- 
+db[:zips].find({:state => "MD"}).projection(state:true, _id:false).first
+{"state"=>"MD"}
+
  
  

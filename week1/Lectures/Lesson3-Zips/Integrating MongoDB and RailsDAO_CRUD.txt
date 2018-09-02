@@ -1,0 +1,120 @@
+1.rails new zips
+add
+gem 'mongoid', '~>5.0.0'
+
+
+
+2.create  mongoid.yml
+rails g mongoid:config
+
+
+3. mongoid.yml
+database: zips_development
+
+
+4.config/application.rb
+loading
+Mongoid.load!('./config/mongoid.yml')
+
+
+
+
+-----------------------------------------------------------------------------
+5. Importing data
+*mongoimport --db zips_development --collection zips --file zips.json
+mongoimport --db zips_development --collection zips --file c:\zips.json
+6. start rails server
+rails s
+
+7. rails console
+rails c
+
+8.
+rails
+other window
+mongo_client = Mongoid::Clients.default
+mongo_client.database.name
+=>"zips_development"
+
+collection=mongo_client[:zips]
+collection.count
+=>29353
+-------------------------------------------------------------------------------------
+
+DAO class
+data access object class infrastructure
+connects to MongoDB
+Access to the collection(Example: "zips")
+Consistent with ORM operation
+*find,insert,update,delete methods in the DAO class
+
+zips.rb
+# convenience method for access to client in console
+def self.mongo_client
+   Mongoid::Clients.default
+end
+
+# convenience method for access to zips collection
+def self.collection
+   self.mongo_client['zips']
+end
+
+
+Simulating a middleware ORM(object-relational mapping) that is consistent with the Rails ActiveModelframework
+¡°Data Access Object¡± and ¡°Entity¡± at the same time
+
+----------------------------------------------------------------------------------------
+CRUD operations
+all-maps to find
+find¨Cmaps to find(hash)
+save-maps to insert_one
+update¨Cmaps to update_one
+destroy¨Cmaps to delete_one
+
+
+all
+Return all documents in zips collection
+self.all(prototype={}, sort={:population=>1}, offset=0, limit=100)
+Paging and Sorting
+------------
+Zip.mongo_client
+Zip.coollection.find.cout
+=>29357
+
+Zip.all.count
+=>29357 although limit is 100, we want to get the count
+
+Zip.all({:state=>"NY"}), sort = {:population => -1}, 0,1).first
+
+
+find and save
+find id 
+Return a specificinstance for a given id
+
+save
+Save the state of the currentinstance
+insert_one
+see zip.rb
+
+Zip.find("11226").population
+=>111396
+check how initialize method works
+
+zip=Zip.net({:id => "00002", :city =>"Dummy City", :state=>"WY", :population =>3})
+zip.save //save to database
+
+Update and destroy
+update   //update
+Update(updates)
+accepts as hash and performs an update on those values after accounting for any name mappings
+zip = Zip.find "00001"
+zip.update({:population=>4})
+
+destroy
+zip = Zip.find "00001"
+zip.destroy
+
+zip.find 
+=>nil
+
+

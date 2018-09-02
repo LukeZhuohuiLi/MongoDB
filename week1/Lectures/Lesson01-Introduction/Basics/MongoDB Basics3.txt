@@ -1,0 +1,40 @@
+Driver Setup
+
+mongo-ruby driver
+gem update ¨C-system
+gem install mongo
+gem install bson_ext
+
+
+Using gem
+require mongo
+
+
+MongoDB Basics (irb shell)
+? Start irb shell
+? Type the following commands:
+> require 'mongo'
+> Mongo::Logger.logger.level =
+::Logger::INFO
+> db =
+Mongo::Client.new('mongodb://localhost:27017')
+> db=db.use('test')
+> db.database.name
+> db.database.collection_names
+> db[:zips].find.first
+
+
+For auth
+irb(main):016:0> client = Mongo::Client.new(['127.0.0.1:27017'])
+=> #<Mongo::Client:0x25104828 cluster=127.0.0.1:27017>
+irb(main):017:0> test2client = client.use('test2')
+=> #<Mongo::Client:0x25437948 cluster=127.0.0.1:27017>
+irb(main):018:0> db = test2client.with(user:'luke', password:'123456')
+=> #<Mongo::Client:0x23160660 cluster=127.0.0.1:27017>
+irb(main):019:0> db.database.name
+=> "test2"
+irb(main):020:0> db.database.collection_names
+=> ["zips"]
+irb(main):021:0> db[:zips].find.first
+=> {"_id"=>"01010", "city"=>"BRIMFIELD", "loc"=>[-72.188455, 42.116543], "pop"=>3706, "state"=>"MA"}
+

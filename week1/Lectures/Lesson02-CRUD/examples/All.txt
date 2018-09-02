@@ -1,0 +1,222 @@
+#disable logging
+require 'mongo'; Mongo::Logger.logger.level = ::Logger::INFO
+
+#get a connection
+db = Mongo::Client.new('mongodb://localhost:27017')
+
+#use test
+db=db.use('test')
+
+#database name
+db.database.name
+
+# List collections
+db.database.collections  OR
+db.database.collection_names
+________________________________________________________
+#(Slide 3)
+#insert_one
+db[:zips].insert_one(:_id => "100",:city => "city01",:loc => [ -76.05922700000001, 39.564894],:pop => 4678,:state => "MD")
+
+#find count (for insert_one)
+db[:zips].find(:city => "city01").count
+=>1
+db[:zips].find(:city => "city01").to_a  //print 
+________________________________________________________
+#(Slide 4)
+#insert_many
+db[:zips].insert_many([ 
+{ :_id => "200", :city => "city02",:loc => [ -74.05922700000001, 37.564894 ],:pop => 2000, :state => "CA" },
+{ :_id => "201", :city => "city03",:loc => [ -75.05922700000001,35.564894 ], 
+  :pop => 3000, :state => "CA" }
+])
+
+________________________________________________________
+#(Slide 5)
+#find count (for insert_many)
+db[:zips].find(:city => 'city02').count
+db[:zips].find(:city => 'city03').count
+
+_id primary key for every document or Mongo will automatically give it to the document.
+
+
+_________________________________________________________________________
+#(Slide 3)
+#find by example 
+db[:zips].find(:city => "BALTIMORE")
+Return view
+
+db[:zips].find(:city => "BALTIMORE").first
+return document
+
+#find first
+db[:zips].find.first
+db[:zips].find(:state => "MD").first
+
+
+#distinct
+db[:zips].find.distinct(:state)
+return different states' name
+
+_________________________________________________________________________
+#(Slide 4)
+#find by (hash) - passing parameters
+db[:zips].find(:city => "GERMANTOWN").count =>8
+db[:zips].find(:city => "GERMANTOWN").first
+
+require 'pp'
+
+pp db[:zips].find(:city => "GERMANTOWN", :state => "NY").first
+pp db[:zips].find(:city => "GERMANTOWN", :state => "MD").first
+
+
+_________________________________________________________________________
+#(Slide 5)
+#cursor iterations
+db[:zips].find().each { |r| puts r }//print everything
+
+db[:zips].find().each { |r| pp r }
+
+
+_________________________________________________________________________
+#(Slide 7)
+
+#PROJECTIONS - //limit the field to return from all matching document
+db[:zips].find({:state => "MD"}).projection(state:true).first
+{"_id"=>"20331", "state" => "MD"}
+
+db[:zips].find({:state => "MD"}).projection(state:true, _id:false).first
+{"state"=>"MD"}
+
+ _________________________________________________________________________
+#(Slide 3)
+#Paging Limit
+db[:zips].find.limit(3).each { |r| pp r}
+retrieves a list of the first three documents for us
+_________________________________________________________________________
+#(slide 4)
+#Limit and Skip
+db[:zips].find.skip(3).limit(3).each { |r| pp r}
+Skips the first three and retrieves the next three
+_________________________________________________________________________
+#(slide 5)
+# Sorting
+#ASCENDING
+db[:zips].find.limit(3).sort({:city => 1 }).each { |r| pp r}
+
+
+#DESCENDING
+db[:zips].find.limit(3).sort({:city => -1 }).each { |r| pp r}
+
+
+	_________________________________________________________________________
+#(slide 2)
+#Find By lt and gt operator
+db[:zips].find(:city => {:$lt =>  'D'}).limit(2).to_a.each { |r| pp r}
+
+db[:zips].find(:city => {:$lt => 'P', :$gt => 'B'}).limit(3).to_a.each{ |r| pp r}
+
+
+_________________________________________________________________________
+#(slide 3)
+#Find by REGEX
+db[:zips].find(:city => {:$regex => 'X'}).limit(5).each {|r| pp r}
+
+
+_________________________________________________________________________
+#(slide 4)
+#Find by REGEX
+db[:zips].find(:city => {:$regex => 'X$'}).limit(5).each {|r| pp r}
+
+________________________________________________________________________
+#(slide 5)
+#Find by REGEX
+db[:zips].find(:city => {:$regex => '^X'}).projection({:_id => false}).limit(5).to_a.each {|r| pp r}
+
+________________________________________________________________________
+#(slide 6)
+#Find by REGEX
+db[:zips].find(:city => {:$regex => '^[A-E]'}).projection({:_id => false}).limit(5).to_a.each {|r| pp r}
+
+
+_______________________________________________________________________
+#(slide 7)
+#Find by $exists
+db[:zips].find(:city => {:$exists => true}).projection({:_id => false}).limit(3).to_a.each {|r| pp r}
+db[:zips].find(:city => {:$exists => true}).projection({:_id => false}).limit(3).to_a.each {|r| pp r}; //take away trailing data
+______________________________________________________________________
+#(slide 8)
+#Find by $not
+db[:zips].find(:pop => {'$not' => {'$gt' => 9500}}).projection({_id:false}).limit(20).to_a.each {|r| pp r}
+
+______________________________________________________________________
+#(slide 9)
+#Find by $type
+db[:zips].find({:state=> {:$type => 2}}).first
+https://docs.mongodb.com/manual/reference/bson-types/
+
+
+
+_________________________________________________________________________
+#(slide 2)
+#replace_one
+
+# first-add a new city (:city => "citytemp")
+db[:zips].insert_one(:_id => "100", :city => "citytemp", :loc => [ -76.05922700000001, 39.564894 ], :pop => 4678, :state => "MD" )
+
+
+# check the insertion
+db[:zips].find(:city => 'citytemp').first
+
+# replace city name from 'citytemp' to 'city02'
+db[:zips].find(:_id => "100").replace_one(:_id => "100", :city => "city02", :loc => [ -78.22, 36.22 ], :pop => 2000, :state => "MD" ) 
+
+
+# check to see if 'city02' is there using _id - YES
+db[:zips].find(:_id => "100").to_a
+
+_________________________________________________________________________
+#(slide 3)
+#update_one
+  
+
+# find and then update_one
+db[:zips].find(:_id => "100").update_one(:$set => {:city => "name2"}) 
+
+
+# verify the update_one
+db[:zips].find(:_id => "100").to_a
+ 
+ _____________________________________________________________________
+#(slide 4) 
+#update_many
+db[:zips].find(:state => 'MD').count
+db[:zips].find(:state => 'MD').update_many(:$set => {:state => 'XX'}) 
+db[:zips].find(:state => 'MD').count
+db[:zips].find(:state => 'XX').count
+
+_________________________________________________________________________
+#(slide 5)
+#delete_one
+db[:zips].find(:city => 'name2').count
+db[:zips].find(:city => 'name2').delete_one()
+db[:zips].find(:city => 'name2').count
+
+_________________________________________________________________________
+#(slide 6)
+#delete_many
+db[:zips].find(:state => 'MD' ).delete_many()
+
+_____________________________________________________________________
+# (slide 7)
+#upsert
+db[:zips].find(:city => "ODENVILLE1").count
+db[:zips].find(:city => "ODENVILLE2").count
+db[:zips].find(:city => "ODENVILLE1").update_one({:$set => {:city => "ODENVILLE2"}}, :upsert => true)
+//if city is found, update, if not found, insert
+db[:zips].find(:city => "ODENVILLE1").count
+db[:zips].find(:city => "ODENVILLE2").count
+
+ 
+ 
+ 
