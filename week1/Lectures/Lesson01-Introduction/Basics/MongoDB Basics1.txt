@@ -15,12 +15,12 @@ switched to db admin
 > use test2
 switched to db test2
 > db.createUser(
-... {
-... user: "luke",
-... pwd: "123456",
-... roles: ["readWrite"]
-... }
-... )
+{
+user: "luke",
+pwd: "123456",
+roles: ["readWrite"]
+}
+)
 Successfully added user: { "user" : "luke", "roles" : [ "readWrite" ] }
 > ^C
 bye

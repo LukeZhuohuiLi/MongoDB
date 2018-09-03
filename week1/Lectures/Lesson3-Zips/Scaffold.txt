@@ -1,0 +1,52 @@
+Model mixin
+scaffold command
+Helper
+
+ActiveModel::Model Mixin Behavior
+class zip
+incloude activeModel::Model
+//by using mixin Zip can use some methods from activemodel
+def persisted?
+ !@id.nil?//check if the a primary key has beeen assigned or saved
+end
+
+def created_at
+nil
+end
+
+def updated_at
+nil
+edn
+
+check to see if a priary key has been assigned
+JSON marshalling will also expect a created_at and updated_at by default
+
+
+scaffold 
+
+rails g scaffold_controller Zip id city state population:integer
+
+
+Controller controls the flow of the application flow of the data come from HTML
+you click a button, it goes into controller and the contoller will call the necessary methods to complete the action
+
+
+Helper
+returns a toZip method
+takes an input and convert it to a zip object
+
+module ZipsHelper
+ def toZip(value)
+    return value.is_a?(Zip) ? value: Zip.new(value)
+ end
+end
+------------------------------------------------------------------------
+connect HTML with the controller
+show 
+new and create
+edit and update
+destroy
+paging
+see  L16 pdf
+
+
