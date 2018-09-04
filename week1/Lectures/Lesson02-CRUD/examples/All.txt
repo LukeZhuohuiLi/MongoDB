@@ -218,5 +218,5 @@ db[:zips].find(:city => "ODENVILLE1").count
 db[:zips].find(:city => "ODENVILLE2").count
 
  
- 
+ mongoimport -h ds247830.mlab.com:47830 -d raceday -c racers -u mongo_user -p mongo_password --file E:\RubyBasics\course3\HW_Week1\module01\assignment-MongoDB-Ruby-Driver-and-Rails\raceday\race_results.json
  
