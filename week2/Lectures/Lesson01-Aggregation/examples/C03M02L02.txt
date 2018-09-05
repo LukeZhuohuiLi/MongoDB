@@ -22,3 +22,10 @@ db[:zips].find.aggregate(
   :state=>{:$toLower=>'$state'},    
   :pop=>1 }},{:$limit=>5}]).each {|r|  
    pp r}
+{"pop" => 4546, "state" => "ma"}
+{"pop" => 10579, "state" => "ma"}
+
+Passes along the documents with only the specified fields to the next stage in the pipeline
+The specified fields can be existing fields from the input documents or newly computed fields
+//exampe: from upper case to lower case
+

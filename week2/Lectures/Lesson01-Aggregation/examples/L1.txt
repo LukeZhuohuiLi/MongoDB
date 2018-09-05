@@ -1,0 +1,54 @@
+SQL
+Mongo
+
+WHERE
+$match
+
+GROUP BY
+$group
+
+SELECT
+$project
+
+ORDER BY
+$sort
+
+LIMIT
+$limit
+
+SUM()
+$sum
+
+COUNT()
+$count
+
+
+
+Aggregation ¡°pipeline¡±
+?Data processing pipeline
+?Filters that operate like queries
+?Grouping and sorting
+?Use of operators to return calculated documents
+?Ex: $limit, $sort, $skip etc¡­
+
+
+aggregation: process data and return customized result
+Running data aggregation on the mongo instance simplifiesapplication code and limitsresource requirements
+
+
+db.orders.aggregate([
+                    {$match: {status: "A"}},
+                    {$group: {_id: "$cust_id", total: {$sum: "amount"}}}
+                    [)
+match all documents have status equal to 'A'
+group these documents by curst_id and sum the amount for each group
+output the result array in different _id with the total in it.
+
+
+
+
+Calculate the result of all poplation in NY state
+db[:zips].find().aggregate([{:$match=>{:state=>'NY'}}, {:$group=>{ :_id=>'NY', :population=>{:$sum=>'$pop'}}}]).to_a
+
+match all documents have state equal to 'NY', group these result by _id => 'NY', and sum the pop attribute
+

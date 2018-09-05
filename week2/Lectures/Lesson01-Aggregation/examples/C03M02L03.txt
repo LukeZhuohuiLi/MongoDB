@@ -1,9 +1,10 @@
-
+﻿
 ________________________________________________________
 #(Slide 4)
 # $sum
 db[:zips].find.aggregate([{ :$group=>{:_id=>'$state', :population=>{:$sum=>'$pop'}}},:$limit=>5]).each {|r| pp r}
-
+{"_id" => "WA", "population" => 4866692}
+{"_id" => "HI", "population" => 1108229}  sum
 ________________________________________________________
 #(Slide 5)
 # $avg
@@ -13,7 +14,8 @@ ________________________________________________________
 #(Slide 6)
 # $max
 db[:zips].find().aggregate([{:$group=>{ :_id=>'$state', :max_zip=>{:$max=>'$pop'}}}, {:$limit=>5}]).each {|r| pp r}
-
+which zip code has the maximum population for a given state
+{"_id" => "WA", "max_zip" => 50515}
 ________________________________________________________
 #(Slide 7)
 # $min
@@ -21,6 +23,7 @@ db[:zips].find().aggregate([{:$group=>{ :_id=>'$state', :min_zip=>{:$min=>'$pop'
 ________________________________________________________
 #(Slide 7)
 # $push
+Return an array of all values that result from applying an expression to each document in a group of documents that share the same group by key.
 db[:zips].find().aggregate(
   [{:$group=>{ :_id=>{:city=>'$city',  
   :state=>'$state'},
