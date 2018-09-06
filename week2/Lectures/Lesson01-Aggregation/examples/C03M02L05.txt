@@ -1,4 +1,7 @@
+unwind
+Peels off the elements of an array individually, and returns a streamof documents
 
+$unwind returns one document for every member of the unwound array within everysource document
 ________________________________________________________
 #(Slide 3)
 # WITHOUT $match
@@ -8,3 +11,8 @@ ________________________________________________________
 #(Slide 4)
 # $unwind
 db[:zips].find().aggregate([{:$match=>{:city=>'ELMIRA'}}, {:$group=>{ :_id=>{:city=>'$city',:state=>'$state'},:zips=>{:$addToSet=>'$_id'}}}, {:$unwind=>'$zips'}]).each {|r| pp r}
+
+if you got different zip codes for the same city
+unwind will return three documents other than gouping them together.
+
+Deconstructs an array field from the input documents to output a document for eachelement.

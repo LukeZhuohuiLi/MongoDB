@@ -1,3 +1,6 @@
+$match pipesthe documents that match its conditions to the next operator in the pipeline
+?The $match query syntax is identicalto the read operation query syntax (find)
+$match ¨Cplaced early in the query-$match operations minimizethe amount of processing down the pipe
 
 ________________________________________________________
 #(Slide 3)

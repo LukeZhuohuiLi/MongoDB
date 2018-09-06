@@ -29,11 +29,15 @@ db[:zips].find().aggregate(
   :state=>'$state'},
   :zips=>{:$push=>'$_id'}}},    
   {:$limit=>15}]).each {|r| pp r}
-
+one city has two zip codes
   ________________________________________________________
 #(Slide 8)
+Returns an array of all unique values that result from
+applying an expression to each document in a group of
+documents that share the same group by key. Order of
+the elements in the output array is unspecified.
 # $addToSet
-
+//every single state 
 db[:zips].find.aggregate([ {:$group=>{:_id=>0, :zips=>{:$push=>"$state"}}}]).first  
 
 db[:zips].find.aggregate([ {:$group=>{:_id=>0, :zips=>{:$addToSet=>"$state"}}}]).first
