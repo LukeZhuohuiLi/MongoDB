@@ -1,0 +1,15 @@
+require './gridfs_loader'
+
+GridfsLoader.mongo_client
+//Connection to database
+
+os_file = File.open("./image3.jpg")
+//load file
+
+grid_file = Mongo::Grid::File.new(os_file.read)
+//create gridfs object
+
+grid_file.methods
+//methods that can be called
+
+
