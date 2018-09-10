@@ -1,0 +1,109 @@
+
+________________________________________________________
+#(Slide 3)
+# include fields
+db[:zips].find.aggregate([{:$project=>{ :_id=>1, :city=>1, :state=>1,:pop=>1 }},{:$limit=>5}]).each {|r| pp r}
+
+
+________________________________________________________
+#(Slide 4)
+#exclude fields
+db[:zips].find.aggregate(
+  [{:$project=>{ :_id=>0, :state=>1,      
+  :pop=>1 }},{:$limit=>5}]).each {|r|    
+  pp r}
+
+
+________________________________________________________
+#(Slide 5)
+# alter data
+db[:zips].find.aggregate(
+  [{:$project=>{:_id=>0,   
+  :state=>{:$toLower=>'$state'},    
+  :pop=>1 }},{:$limit=>5}]).each {|r|  
+   pp r}
+{"pop" => 4546, "state" => "ma"}
+{"pop" => 10579, "state" => "ma"}
+
+Passes along the documents with only the specified fields to the next stage in the pipeline
+The specified fields can be existing fields from the input documents or newly computed fields
+//exampe: from upper case to lower case
+
+
+________________________________________________________
+#(Slide 4)
+# $sum
+db[:zips].find.aggregate([{ :$group=>{:_id=>'$state', :population=>{:$sum=>'$pop'}}},:$limit=>5]).each {|r| pp r}
+{"_id" => "WA", "population" => 4866692}
+{"_id" => "HI", "population" => 1108229}  sum
+________________________________________________________
+#(Slide 5)
+# $avg
+db[:zips].find.aggregate([{ :$group=>{ :_id=>'$state', :ave_population=>{:$avg=>'$pop'}}},{:$limit=>5}]).each {|r| pp r}
+
+________________________________________________________
+#(Slide 6)
+# $max
+db[:zips].find().aggregate([{:$group=>{ :_id=>'$state', :max_zip=>{:$max=>'$pop'}}}, {:$limit=>5}]).each {|r| pp r}
+which zip code has the maximum population for a given state
+{"_id" => "WA", "max_zip" => 50515}
+________________________________________________________
+#(Slide 7)
+# $min
+db[:zips].find().aggregate([{:$group=>{ :_id=>'$state', :min_zip=>{:$min=>'$pop'}}}, {:$limit=>5}]).each {|r| pp r}
+________________________________________________________
+#(Slide 7)
+# $push
+Return an array of all values that result from applying an expression to each document in a group of documents that share the same group by key.
+db[:zips].find().aggregate(
+  [{:$group=>{ :_id=>{:city=>'$city',  
+  :state=>'$state'},
+  :zips=>{:$push=>'$_id'}}},    
+  {:$limit=>15}]).each {|r| pp r}
+one city has two zip codes
+  ________________________________________________________
+#(Slide 8)
+Returns an array of all unique values that result from
+applying an expression to each document in a group of
+documents that share the same group by key. Order of
+the elements in the output array is unspecified.
+# $addToSet
+//every single state 
+db[:zips].find.aggregate([ {:$group=>{:_id=>0, :zips=>{:$push=>"$state"}}}]).first ?
+
+db[:zips].find.aggregate([ {:$group=>{:_id=>0, :zips=>{:$addToSet=>"$state"}}}]).first
+
+$match pipesthe documents that match its conditions to the next operator in the pipeline
+?The $match query syntax is identicalto the read operation query syntax (find)
+$match ¨Cplaced early in the query-$match operations minimizethe amount of processing down the pipe
+
+________________________________________________________
+#(Slide 3)
+# $match
+db[:zips].find({:state=>'DE'}).first
+
+db[:zips].find().aggregate([ {:$match=>{:state=>'DE'}}]).first
+________________________________________________________
+#(Slide 4)
+# $match
+db[:zips].find().aggregate([{:$match=>{:state=>'NY'}}, {:$group=>{ :_id=>'$city', :population=>{:$sum=>'$pop'}}}, {:$project=>{ :_id=>0, :city=>'$_id', :population=>1}}, {:$sort=>{ :population=>-1 }},{:$limit=>5}]).each {|r| pp r}
+
+
+unwind
+Peels off the elements of an array individually, and returns a streamof documents
+
+$unwind returns one document for every member of the unwound array within everysource document
+________________________________________________________
+#(Slide 3)
+# WITHOUT $match
+db[:zips].find().aggregate([{:$match=>{:city=>'ELMIRA'}}, {:$group=>{ :_id=>{:city=>'$city',:state=>'$state'}, :zips=>{:$addToSet=>'$_id'}}}]).each {|r| pp r} 
+
+________________________________________________________
+#(Slide 4)
+# $unwind
+db[:zips].find().aggregate([{:$match=>{:city=>'ELMIRA'}}, {:$group=>{ :_id=>{:city=>'$city',:state=>'$state'},:zips=>{:$addToSet=>'$_id'}}}, {:$unwind=>'$zips'}]).each {|r| pp r}
+
+if you got different zip codes for the same city
+unwind will return three documents other than gouping them together.
+
+Deconstructs an array field from the input documents to output a document for eachelement.
