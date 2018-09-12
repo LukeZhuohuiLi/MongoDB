@@ -1,5 +1,5 @@
 #disable logging
-require 'mongo'; Mongo::Logger.logger.level = ::Logger::INFO
+require 'mongo';           Mongo::Logger.logger.level = ::Logger::INFO
 
 #get a connection
 db = Mongo::Client.new('mongodb://localhost:27017')
@@ -219,4 +219,12 @@ db[:zips].find(:city => "ODENVILLE2").count
 
  
  mongoimport -h ds247830.mlab.com:47830 -d raceday -c racers -u mongo_user -p mongo_password --file E:\RubyBasics\course3\HW_Week1\module01\assignment-MongoDB-Ruby-Driver-and-Rails\raceday\race_results.json
+
+
+
+races.find(:name=>{:$exists=>true}).each do |r|
+result=racers.update_one({:name=>r[:name]}, {:upsert=>true})
+id=result.upserted_id
+races.update_one({:_id=>r[:_id]},{:$set=>{:racer_id=>id},:$unset=>{:name=>""}})
+end
  
