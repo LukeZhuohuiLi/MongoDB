@@ -228,3 +228,6 @@ id=result.upserted_id
 races.update_one({:_id=>r[:_id]},{:$set=>{:racer_id=>id},:$unset=>{:name=>""}})
 end
  
+
+{"long_name":"Wilsden", "short_name":"Wilsden", "types":["administrative_area_level_4", "political"]},
+{"long_name":"Bradford District", "short_name":"Bradford District", "types":["administrative_area_level_]
