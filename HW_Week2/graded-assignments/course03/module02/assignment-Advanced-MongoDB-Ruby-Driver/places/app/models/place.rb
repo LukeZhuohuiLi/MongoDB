@@ -1,6 +1,6 @@
 class Place
   include Mongoid::Document
-
+  include ActiveModel::Model
   attr_accessor :id, :formatted_address, :location, :address_components 
 
   PLACES_COLLECTION = 'places'
@@ -118,5 +118,18 @@ class Place
   	self.class.collection.find(:_id => BSON::ObjectId.from_string(@id)).delete_one
   end
 
-  
+  def photos(offset = 0, limit = nil)
+
+  if !limit.nil?
+    a = Photo.find_photos_for_place(@id).skip(offset).limit(limit)
+  else
+    a = Photo.find_photos_for_place(@id).skip(offset)#a will be a view result(cursor/pointer)
+  end                                                #not a Photo instance
+    if !a.nil?
+    a.map{|x| Photo.new(x)}  #re-create Photo instance
+    else
+    nil
+    end
+  end
+
 end

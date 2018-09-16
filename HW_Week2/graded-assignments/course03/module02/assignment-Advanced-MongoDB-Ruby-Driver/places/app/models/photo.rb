@@ -1,13 +1,13 @@
 class Photo
   
-  attr_accessor :id, :location, :place
+  attr_accessor :id, :location
   attr_writer :contents
 
   def initialize(params = nil)
   	if !params.nil?
   	@id = params[:_id].nil? ? params[:id] : params[:_id].to_s 
   	@location = Point.new(params[:metadata][:location])
-  	@place =
+  	@place = params[:metadata][:place] if !params[:metadata].nil?
     end
   end
 
@@ -38,7 +38,9 @@ class Photo
      update_one(:metadata => {:location => @location.to_hash, :place => @place })
      #the find command returns a "pointer"
      #or view "cursor" for us to update the document
-     #use find.first will cause error because it is the acutual content  
+     #use find.first will cause error because it will return the acutual content  
+
+     #another solution, but actually update all attr of the document.
      #doc = self.class.mongo_client.database.fs.find(
      #  '_id': BSON::ObjectId.from_string(@id)
      #).first
@@ -91,6 +93,24 @@ class Photo
  end
 
  def place
-
+ 	if !@place.nil?
+     Place.find(@place)
+    end
  end
+
+ def place=(p)
+ 	if p.is_a? String
+    @place = BSON::ObjectId.from_string(p)
+    elsif p.instance_of? Place
+    @place = BSON::ObjectId.from_string(p.id)
+    else#BSON::ObjectId
+    @place = p
+    end
+ end
+
+ def self.find_photos_for_place(place_id)
+  a = mongo_client.database.fs.find({:"metadata.place" => BSON::ObjectId.from_string(place_id)})
+  a.nil? ? nil : a
+ end
+
 end
