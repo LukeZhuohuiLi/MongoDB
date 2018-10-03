@@ -4,5 +4,6 @@ class Racer
   field :last_name, as: :ln, type: String
   field :date_of_birth, as: :dob, type: Date
 
-  embeds_one :primary_address, class_name: 'Address'
+  embeds_one :primary_address, as: :addressable, class_name: 'Address'
+
 end
