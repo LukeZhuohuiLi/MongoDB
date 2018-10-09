@@ -11,4 +11,10 @@ class RacerInfo
 
   embedded_in :parent, polymorphic: true
 
+  validates :first_name, presence: true
+  validates :last_name, presence: true
+  validates :gender, presence: true
+  validates :birth_year, presence: true
+  validates :gender, :inclusion=> { :in => ['M', 'F'] }
+  validates :birth_year, :numericality => { :less_than => Date.current.year }
 end
