@@ -36,21 +36,41 @@ swim.units
 end
 =end
 
-  DEFAULT_EVENTS.keys.each do |name|
-  		define_method("#{name}") do
-  		event=events.select {|event| name==event.name}.first
-  		event||=events.build(DEFAULT_EVENTS["#{name}"])
+  DEFAULT_EVENTS.keys.each do |name|#swim,t1,bike,t2,run
+  		define_method("#{name}") do#def swin or t1...etc
+  		event=events.select {|event| name==event.name}.first #event=events.select {|event| "swim"==event.name}.first #get selected event object
+  		event||=events.build(DEFAULT_EVENTS["#{name}"])#event||=events.build(DEFAULT_EVENTS["swim"])#build an event object with hash key "#name" if event is nil
   		end
   		["order","distance","units"].each do |prop|
-  			if DEFAULT_EVENTS["#{name}"][prop.to_sym]
-  				define_method("#{name}_#{prop}") do
-  				event=self.send("#{name}").send("#{prop}")
-  				end
-  				define_method("#{name}_#{prop}=") do |value|
+  			if DEFAULT_EVENTS["#{name}"][prop.to_sym]#if hash is not nil
+  				define_method("#{name}_#{prop}") do#def swim_order
+  				event=self.send("#{name}").send("#{prop}")#event = self.swin.order if prop is :order getter
+  				end#self.swin will call the swin method, ".order" will return from the event instance
+  				define_method("#{name}_#{prop}=") do |value|#setter
   				event=self.send("#{name}").send("#{prop}=", value)
   				end
   			end
   		end
   end
+
+	def self.default
+		Race.new do |race|
+		DEFAULT_EVENTS.keys.each {|leg|race.send("#{leg}")}#invoke def swin,bike.etc
+		end
+	end
+
+	
+["city", "state"].each do |action|
+     define_method("#{action}") do
+     self.location ? self.location.send("#{action}") : nil
+     end
+     define_method("#{action}=") do |name|
+     object=self.location ||= Address.new
+     object.send("#{action}=", name)
+     self.location=object
+     end
+end
+
+
 
 end
