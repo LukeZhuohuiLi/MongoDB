@@ -61,12 +61,12 @@ class Entrant
 	end
 
 	#expose setter/getter for each property of each result
-	RESULTS["#{name}"].attribute_names.reject {|r|/^_/===r}.each do |prop|#reject hash value which started with _ ?
-		define_method("#{name}_#{prop}") do#def swim_SwimResult
-			event=self.send(name).send(prop)#self.swim.SwimResult//getter
+	RESULTS["#{name}"].attribute_names.reject {|r|/^_/===r}.each do |prop|#reject hash  which started with _ ?
+		define_method("#{name}_#{prop}") do#def swim_secs
+			event=self.send(name).send(prop)#self.swim.secs//getter
 		end
-		define_method("#{name}_#{prop}=") do |value|#def swim_SwimResult=
-			event=self.send(name).send("#{prop}=",value)#self.swim.SwimResult = value
+		define_method("#{name}_#{prop}=") do |value|#def swim_secs=
+			event=self.send(name).send("#{prop}=",value)#self.swim.secs = value
 			update_total nil if /secs/===prop
 		end
 	end
