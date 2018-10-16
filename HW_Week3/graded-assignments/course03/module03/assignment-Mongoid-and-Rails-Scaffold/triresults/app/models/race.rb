@@ -10,8 +10,8 @@ class Race
   has_many :entrants, foreign_key: "race._id",dependent: :delete, order: [:secs.asc, :bib.asc]
   #entrants->race(class:RaceRef)->_id
   
-  scope :upcoming, -> {where(:date.gte => Date.current)}
-  scope :past, -> {where(:date.lt => Date.current)}
+  scope :upcoming, -> { where(:date.gte => Date.current)}
+  scope :past, -> { where(:date.lt => Date.current)}
 
   DEFAULT_EVENTS = {"swim"=>{:order=>0, :name=>"swim", :distance=>1.0, :units=>"miles"},
   "t1"=> {:order=>1, :name=>"t1"},
@@ -105,4 +105,47 @@ end
   	end
   	return entrant
   end
+
+  def self.upcoming_available_to racer
+    upcoming_race_ids = racer.races.upcoming.pluck(:race).map {|r| r[:_id]}
+    k = self.upcoming
+    k.where.not(:id => upcoming_race_ids)
+  end
+  # race1: Race _id: 5bc4fba7ea846f0bdccfc0a8
+  # race2: Race _id: 5bc4fbacea846f0bdccfc0a9
+  # race3: Race _id: 5bc4fbc8ea846f0bdccfc0ab
+  # race2.create_entrant racer
+  # race2.entrants.each{|e| pp e}   Entrant _id: 5bc4fbb5ea846f0bdccfc0aa
+  # Racer _id: 5bc4eb79ea846f0bdccfc0a3
+  #
+  #upcoming_race_ids = racer.races.upcoming.pluck(:race).map {|r| r[:_id]}
+  #find all id of races in parent object "racer" where race.date greater than or equal to today
+  #will return id of race2
+  #
+  #
+  #Race.in(arrays of ids) will return Race objects according to (arrays of ids)
+  #Race.not_in(arrays of ids) will return all other Race objects except objects where id = (arrays of ids) 
+  #
+  #
+  #self.upcoming.not_in(:id => upcoming_race_ids) is equivalent to Race.upcoming.not_in(:id => upcoming_race_ids)
+  #which will return all other upcoming Race objects except the race objects with upcoming_race_ids:5bc4fbacea846f0bdccfc0a9
+  #
+  #Race.upcoming_available_to(racer).where(:name=>{:$regex=>"A2"}).pluck(:name,:date,:id)
+  #[["Thinking About It A2", 2018-11-15 00:00:00 UTC, BSON::ObjectId('5bc4fbc8ea846f0bdccfc0ab')]]
+  #
+  #Race.upcoming_available_to(racer).where(:name=>{:$regex=>"A2"}).pluck(:name,:date,:id)
+  #For irb console:
+  #upcoming_race_ids = racer.races.upcoming.pluck(:race).map {|r| r[:_id]}
+  #Race.upcoming.not_in(:id => upcoming_race_ids).where(:name=>{:$regex=>"A2"}).pluck(:name,:date,:id)
+  # [["Thinking About It A2", 2018-11-15 00:00:00 UTC, BSON::ObjectId('5bc4fbc8ea846f0bdccfc0ab')]]
+  #
+  #
+  #got a bug when testing Race.not.upcoming_available_to(racer).where(:name=>{:$regex=>"A2"}).pluck(:name,:date)
+  #Result
+  #It can pass the rspec test, but it would be better if I can solve this bug
+  #
+  #
+  #
+  #
+  #
 end
