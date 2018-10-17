@@ -107,16 +107,49 @@ end
   end
 
   def self.upcoming_available_to racer
-    upcoming_race_ids = racer.races.upcoming.pluck(:race).map {|r| r[:_id]}
-    k = self.upcoming
-    k.where.not(:id => upcoming_race_ids)
-  end
-  # race1: Race _id: 5bc4fba7ea846f0bdccfc0a8
-  # race2: Race _id: 5bc4fbacea846f0bdccfc0a9
-  # race3: Race _id: 5bc4fbc8ea846f0bdccfc0ab
+  	race_ids = racer.races.pluck(:race).map {|r| r[:_id]}
+  	a = Race.upcoming.first
+  	b = Race.past.first
+  	if((a.nil? == false) && (b.nil? == false))
+       if(a.date > b.date)
+       	self.upcoming.not_in(:id => race_ids)
+       else
+       	self.upcoming.in(:id => race_ids)
+       end
+  	elsif((a.nil? == true) && (b.nil? == false))
+  	   if(b.date < Date.current)#"not" is not added, since a.nil? == true, no upcoming available
+  	   	nil
+  	   else#has upcoming b.date>date.current means "not" is added
+  	   	self.past.in(:id => race_ids)#self.upcoming.not_in(:id => race_ids)
+  	   end
+  	 elsif((a.nil? == false) && (b.nil? == true))
+  	 	if(a.date > Date.current)#"not" is not added, upcoming available
+  	 	self.upcoming.not_in(:id => race_ids)
+  	    else#a.date < Date.current, "not" is added, past available
+  	    self.upcoming.in(:id => race_ids)
+
+
+
+    # if(!upcoming_race_ids.empty?)
+    # 	a = Race.find(:id => upcoming_race_ids.first)
+    # 	b = Race.past.first
+
+    # 	if a.date > b.date
+    # 		self.upcoming.not_in(:id => upcoming_race_ids)
+    # 	else
+    # 		self.upcoming.in(:id => upcoming_race_ids)
+    # 	end
+    # else
+    # 	return self.upcoming
+    # end
+
+end
+  # race1: Race _id: 5bc4fba7ea846f0bdccfc0a8,5bc6a3b6ea846f237802d1ba
+  # race2: Race _id: 5bc4fbacea846f0bdccfc0a9,5bc6b165ea846f237802d1bf
+  # race3: Race _id: 5bc4fbc8ea846f0bdccfc0ab,5bc6a426ea846f237802d1bd
   # race2.create_entrant racer
-  # race2.entrants.each{|e| pp e}   Entrant _id: 5bc4fbb5ea846f0bdccfc0aa
-  # Racer _id: 5bc4eb79ea846f0bdccfc0a3
+  # race2.entrants.each{|e| pp e}   Entrant _id: 5bc4fbb5ea846f0bdccfc0aa, 5bc6b173ea846f237802d1c0
+  # Racer _id: 5bc4eb79ea846f0bdccfc0a3,5bc6b102ea846f237802d1be
   #
   #upcoming_race_ids = racer.races.upcoming.pluck(:race).map {|r| r[:_id]}
   #find all id of races in parent object "racer" where race.date greater than or equal to today
@@ -141,11 +174,12 @@ end
   #
   #
   #got a bug when testing Race.not.upcoming_available_to(racer).where(:name=>{:$regex=>"A2"}).pluck(:name,:date)
-  #Result
-  #It can pass the rspec test, but it would be better if I can solve this bug
+  #Result is a nil array []
+  #It can pass the rspec test, if I use not for upcoming_available_to method
+  #upcoming will be not=>upcoming, but it also change .in to not=>.in and not_in to not=>not_in
+  #which causes wrong output result.
+  #for not_in : "filter"=>{"date"=>{"$not"=>{"$gte"=>2018-10-17 00:00:00 UTC}}, "_id"=>{"$not"=>{"$nin"=>[]}}
   #
-  #
-  #
-  #
-  #
+  #I couldn't come up with a solution for this bug.
+  #5bc6b102ea846f237802d1be
 end
