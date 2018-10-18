@@ -49,11 +49,11 @@
         <th>City</th>
         <th>State</th>
         <th>Swim distance</th>
-        <th>units</th>
+        <th>Swim units</th>
         <th>Bike distance</th>
-        <th>units</th>
+        <th>Bike units</th>
         <th>Run distance</th>
-        <th>units</th>
+        <th>Run units</th>
         <th colspan="3"></th>
       </tr>
     </thead>
@@ -70,8 +70,7 @@
           <td><%= race.bike_units %></td>          
           <td><%= race.run_distance %></td>
           <td><%= race.run_units %></td>
-          <td>
-            <%= link_to 'Register', racer_entries_path(@racer, :race_id=>race.id), method: :post %>
+          <td><%= link_to 'Register', racer_entries_path(@racer, :race_id=>race.id), method: :post %></td>
           </td>
         </tr>
       <% end %>
