@@ -71,7 +71,7 @@ end
 end
 
   def next_bib
-   self[:next_bib] = self.inc(next_bib: 1)[:next_bib]#[:next_bib] to avoid an infinite loop within next_bib
+   self[:next_bib] = self.inc(next_bib: 1)[:next_bib]#[:next_bib] to avoid an infinite loop within next_bib method
    #self.inc(next_bib: 1) Performs an atomic $inc on the field.
    #https://docs.mongodb.com/mongoid/master/tutorials/mongoid-persistence/#atomic
    #self[:next_bib] = self[:next_bib] + 1#not going to work for rspec spec/service_facade_spec.rb -e rq03
@@ -107,49 +107,52 @@ end
   end
 
   def self.upcoming_available_to racer
-  	race_ids = racer.races.pluck(:race).map {|r| r[:_id]}
-  	a = Race.upcoming.first
-  	b = Race.past.first
+  	nilArray = []
+  	race_ids = racer.races.pluck(:race).map {|r| r[:_id]}#"not.method" will not affect object query to DB
+  	a = Race.upcoming.first#"not.method" will affect class query to DB, the actual DB query will look like Race.past.first
+  	b = Race.past.first#Race.upcoming.first
   	if((a.nil? == false) && (b.nil? == false))
-       if(a.date > b.date)
-       	self.upcoming.not_in(:id => race_ids)
-       else
-       	self.upcoming.in(:id => race_ids)
+  		if(a.date > b.date)
+  			self.upcoming.not_in(:id => race_ids)
+  		else
+       	self.upcoming.in(:id => race_ids)#for "not.method" same as self.past.not_in(:id => race_ids)
        end
-  	elsif((a.nil? == true) && (b.nil? == false))
-  	   if(b.date < Date.current)#"not" is not added, since a.nil? == true, no upcoming available
-  	   	nil
-  	   else#has upcoming b.date>date.current means "not" is added
-  	   	self.past.in(:id => race_ids)#self.upcoming.not_in(:id => race_ids)
+   elsif((a.nil? == true) && (b.nil? == false))
+  	   if(b.date < Date.current)#"not." is not added, since a is nil, no upcoming available
+  	   	nilArray
+  	   else#upcoming available, b.date>date.current means "not." is added, no past available
+  	   	nilArray
   	   end
-  	 elsif((a.nil? == false) && (b.nil? == true))
+  	elsif((a.nil? == false) && (b.nil? == true))
   	 	if(a.date > Date.current)#"not" is not added, upcoming available
-  	 	self.upcoming.not_in(:id => race_ids)
+  	 		self.upcoming.not_in(:id => race_ids)
   	    else#a.date < Date.current, "not" is added, past available
-  	    self.upcoming.in(:id => race_ids)
+  	    	self.upcoming.in(:id => race_ids)
+  	    end
+  	elsif((a.nil? == true) && (b.nil? == true))
+  		nilArray
+  	end
 
+#
+#upcoming_race_ids = racer.races.upcoming.pluck(:race).map {|r| r[:_id]}
+#self.upcoming.not_in(:id => upcoming_race_ids)
+#irb(main):907:0> Race.not.upcoming_available_to(racer).where(:name=>{:$regex=>"A2"}).pluck(:name,:date)
 
+# upcoming_race_ids = racer.races.upcoming.pluck(:race).map {|r| r[:_id]}
+# D, [2018-10-17T12:22:59.005315 #9080] DEBUG -- : MONGODB | localhost:27017 | triresults_development.find | STARTED | {"find"=>"results", "filter"=>{"racer.racer_id"=>BSON::ObjectId('5bc6b102ea846f237802d1be'), "race.date"=>{"$gte"=>2018-10-17 00:00:00 UTC}}, "sort"=>{"race.date"=>-1}, "projection"=>{"race"=>1}, "lsid"=>{"id"=><BSON::Binary:0x62078100 type=uuid data=...
+# D, [2018-10-17T12:22:59.016316 #9080] DEBUG -- : MONGODB | localhost:27017 | triresults_development.find | SUCCEEDED | 0.011s
 
-    # if(!upcoming_race_ids.empty?)
-    # 	a = Race.find(:id => upcoming_race_ids.first)
-    # 	b = Race.past.first
-
-    # 	if a.date > b.date
-    # 		self.upcoming.not_in(:id => upcoming_race_ids)
-    # 	else
-    # 		self.upcoming.in(:id => upcoming_race_ids)
-    # 	end
-    # else
-    # 	return self.upcoming
-    # end
+#self.upcoming.not_in(:id => upcoming_race_ids)
+# D, [2018-10-17T12:22:59.017302 #9080] DEBUG -- : MONGODB | localhost:27017 | triresults_development.find | STARTED | {"find"=>"races", "filter"=>{"date"=>{"$not"=>{"$gte"=>2018-10-17 00:00:00 UTC}}, "_id"=>{"$not"=>{"$nin"=>[BSON::ObjectId('5bc6b165ea846f237802d1bf')]}}, "n"=>{"$regex"=>"A2"}}, "projection"=>{"n"=>1, "date"=>1}, "lsid"=>{"id"=><BSON::Binary:0x620781...
+# D, [2018-10-17T12:22:59.029561 #9080] DEBUG -- : MONGODB | localhost:27017 | triresults_development.find | SUCCEEDED | 0.011s
 
 end
-  # race1: Race _id: 5bc4fba7ea846f0bdccfc0a8,5bc6a3b6ea846f237802d1ba
-  # race2: Race _id: 5bc4fbacea846f0bdccfc0a9,5bc6b165ea846f237802d1bf
-  # race3: Race _id: 5bc4fbc8ea846f0bdccfc0ab,5bc6a426ea846f237802d1bd
+  # race1: Race _id: 5bc4fba7ea846f0bdccfc0a8
+  # race2: Race _id: 5bc4fbacea846f0bdccfc0a9
+  # race3: Race _id: 5bc4fbc8ea846f0bdccfc0ab
   # race2.create_entrant racer
-  # race2.entrants.each{|e| pp e}   Entrant _id: 5bc4fbb5ea846f0bdccfc0aa, 5bc6b173ea846f237802d1c0
-  # Racer _id: 5bc4eb79ea846f0bdccfc0a3,5bc6b102ea846f237802d1be
+  # race2.entrants.each{|e| pp e}   Entrant _id: 5bc4fbb5ea846f0bdccfc0aa 
+  # Racer _id: 5bc4eb79ea846f0bdccfc0a3 
   #
   #upcoming_race_ids = racer.races.upcoming.pluck(:race).map {|r| r[:_id]}
   #find all id of races in parent object "racer" where race.date greater than or equal to today
@@ -175,11 +178,21 @@ end
   #
   #got a bug when testing Race.not.upcoming_available_to(racer).where(:name=>{:$regex=>"A2"}).pluck(:name,:date)
   #Result is a nil array []
-  #It can pass the rspec test, if I use not for upcoming_available_to method
-  #upcoming will be not=>upcoming, but it also change .in to not=>.in and not_in to not=>not_in
-  #which causes wrong output result.
-  #for not_in : "filter"=>{"date"=>{"$not"=>{"$gte"=>2018-10-17 00:00:00 UTC}}, "_id"=>{"$not"=>{"$nin"=>[]}}
+  #It can pass the rspec test if I use "not." for upcoming_available_to method
   #
-  #I couldn't come up with a solution for this bug.
-  #5bc6b102ea846f237802d1be
+  #
+  #
+  #
+  #
+  #
+  #For "not."
+  #upcoming will be "not=>upcoming", but it also change ".in" to "not=>in" and "not_in" to "not=>not_in"
+  #which causes wrong output result.
+  #Actual MongoDB query for not.upcoming_available_to, self.upcoming.not_in it's actually 
+  #"filter"=>{"date"=>{"$not"=>{"$gte"=>2018-10-17 00:00:00 UTC}}, "_id"=>{"$not"=>{"$nin"=>[]}}
+  #
+  #
+  #
+  #
+  #
 end
