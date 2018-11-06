@@ -1,28 +1,12 @@
 module Api
   class RacesController < ApplicationController 
 
-    rescue_from Mongoid::Errors::DocumentNotFound do |exception|
-      @msg = "woops: cannot find race[#{params[:id]}]"
-      if !request.accept || request.accept == "*/*"
-        render plain: @msg, status: :not_found
-      else
-        render action: :error, status: :not_found, content_type: "#{request.accept}"
-        #respond_to do |format|
-        #  format.json { render "error", status: :not_found, content_type: "#{request.accept}" }
-        #  format.xml  { render "error", status: :not_found, content_type: "#{request.accept}" }
-        #end
-      end
-    end
-
-    rescue_from ActionView::MissingTemplate do |exception|
-      render plain: "woops: we do not support that content-type[#{request.accept}]", :status => 415
-    end
+   
 
     def index
       if !request.accept || request.accept == "*/*"
         render plain: "/api/races, offset=[#{params[:offset]}], limit=[#{params[:limit]}]"
       else
-      #real implementation ...
       end
     end
 
@@ -30,9 +14,8 @@ module Api
       if !request.accept || request.accept == "*/*"
         render plain: "/api/races/#{params[:id]}"
       else
-      #real implementation ...
         @race = Race.find(params[:id])
-        render "race", content_type: "#{request.accept}"
+        render json: @race
       end
     end
 
@@ -40,8 +23,7 @@ module Api
       if !request.accept || request.accept == "*/*" 
         render plain: "#{params[:race][:name]}", status: :ok
       else
-      #real implementation
-        @race = Race.new(race_params)
+       @race = Race.new(race_params)
         if @race.save
           render plain: race_params[:name], status: :created
         else
@@ -54,7 +36,7 @@ module Api
       Rails.logger.debug("method=#{request.method}")
       @race = Race.find(params[:id])
       if @race.update(race_params)
-        render json: @race
+        render json: @race, status: :ok
       else
         render json: @race.errors
       end

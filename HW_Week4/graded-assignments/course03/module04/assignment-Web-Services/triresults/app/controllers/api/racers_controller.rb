@@ -2,7 +2,7 @@ module Api
   class RacersController < ApplicationController 
     def index
       if !request.accept || request.accept == "*/*"
-        render plain: "/api/racers"
+        render plain: "/api/racers, #{request.accept}"
       else
       #real implementation ...
       end
