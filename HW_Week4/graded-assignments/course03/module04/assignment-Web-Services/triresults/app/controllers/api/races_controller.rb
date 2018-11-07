@@ -1,7 +1,19 @@
 module Api
   class RacesController < ApplicationController 
 
-   
+   rescue_from Mongoid::Errors::DocumentNotFound do |exception|
+      @msg = "woops: cannot find race[#{params[:id]}]"
+      if !request.accept || request.accept == "*/*"
+        render plain: @msg, status: :not_found
+      else
+        render action: :error, status: :not_found, content_type: "#{request.accept}"
+      
+      end
+    end
+
+     rescue_from ActionView::MissingTemplate do |exception|
+      render plain: "woops: we do not support that content-type[#{request.accept}]", :status => 415
+    end
 
     def index
       if !request.accept || request.accept == "*/*"
@@ -10,14 +22,25 @@ module Api
       end
     end
 
+    # def show
+    #   if !request.accept || request.accept == "*/*"
+    #     render plain: "/api/races/#{params[:id]}"
+    #   else
+    #     @race = Race.find(params[:id])
+    #     case request.accept
+    #     when "application/xml" then render xml: @race
+    #     when "application/json" then render json: @race
+    #     end
+    #   end
+    # end
     def show
-      if !request.accept || request.accept == "*/*"
-        render plain: "/api/races/#{params[:id]}"
-      else
-        @race = Race.find(params[:id])
-        render json: @race
-      end
-    end
+	if !request.accept || request.accept == "*/*"
+		render plain: "/api/races/#{params[:id]}"
+	elsif (request.accept.include? "application/xml") || (request.accept.include? "application/json") then
+		@race = Race.find(params[:id])
+		render "race", content_type: "#{request.accept}"
+	end
+   end
 
     def create
       if !request.accept || request.accept == "*/*" 
@@ -36,7 +59,7 @@ module Api
       Rails.logger.debug("method=#{request.method}")
       @race = Race.find(params[:id])
       if @race.update(race_params)
-        render json: @race, status: :ok
+        render json: @race
       else
         render json: @race.errors
       end
