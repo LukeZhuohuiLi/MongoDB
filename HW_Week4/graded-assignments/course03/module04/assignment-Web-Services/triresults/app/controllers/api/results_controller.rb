@@ -4,14 +4,15 @@ module Api
       if !request.accept || request.accept == "*/*"
         render plain: "/api/races/#{params[:race_id]}/results"
       else
-      #real implementation ...
         @race = Race.find(params[:race_id])
         @entrants = @race.entrants
-        #fresh_when last_modified: @entrants.max(:updated_at)
-        #render :index
+
         if stale? last_modified: @entrants.max(:updated_at)
           render :index
         end
+
+         #fresh_when last_modified: @entrants.max(:updated_at)
+        #render :index
       end
     end
 
@@ -20,7 +21,7 @@ module Api
         render plain: "/api/races/#{params[:race_id]}/results/#{params[:id]}"
       else
         @result = Race.find(params[:race_id]).entrants.where(:id=>params[:id]).first
-        render :show
+        render :partial=>"result", :object=>@result
       end
     end
 
